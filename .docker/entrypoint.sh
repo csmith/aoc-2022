@@ -1,24 +1,14 @@
 #!/bin/bash
 
-. /usr/local/bin/docker-entrypoint.sh
+set -e
+cd /code
 
-docker_setup_env >/dev/null
-docker_create_db_directories >/dev/null
-
-if [ "$(id -u)" = '0' ]; then
-  exec gosu postgres "$BASH_SOURCE" "$@"
+if [ -d "$1" ]; then
+    if [ ! -f "${GOPATH}/bin/$1" ] || [ "${GOPATH}/bin/$1" -nt "$1/main.go" ]; then
+        export HOME="/tmp"
+        go get -d -v ./... >/dev/null 2>&1
+        go install ./... >/dev/null
+    fi
+    export GOGC=off
+    time "${GOPATH}/bin/$1"
 fi
-
-docker_init_database_dir >/dev/null 2>&1
-pg_setup_hba_conf >/dev/null 2>&1
-postgres >/dev/null 2>&1 &
-
-while ! pg_isready >/dev/null; do
-  sleep 0.1
-done
-
-cd "/code/$1" || exit
-
-psql -q -f schema.sql
-
-time psql -q -t -f run.sql

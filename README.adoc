@@ -1,6 +1,8 @@
 = Advent of Code 2022
 
-This repository contains my solution to 2022's https://adventofcode.com/2022[Advent of Code] puzzles in SQL using Postgres.
+This repository contains my solution to 2022's https://adventofcode.com/2022[Advent of Code] puzzles in Go.
+I started doing day 1-6 in SQL using Postgres, but the amount of text manipulation needed was tiresome; those
+are preserved in the 'sql' branch.
 
 The easiest way to run these is using docker – simply execute run.sh <day> to build a docker image and execute the specific day.
 
