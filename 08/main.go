@@ -22,6 +22,13 @@ func main() {
 	part2 := int64(0)
 	for y := range m {
 		for x := range m[y] {
+			if y == 0 || x == 0 || y == len(m)-1 || x == len(m[y])-1 {
+				// Optimisation: trees in the outer ring are always on the outside, and will
+				// never produce the best scenery because one side will be 0.
+				part1++
+				continue
+			}
+
 			outside := false
 			visible := int64(1)
 
@@ -31,7 +38,7 @@ func main() {
 			for c := range cardinals {
 				// Trace a path in each cardinal direction until we hit a tree or escape.
 				// For part 2 it's slightly fiddly as a higher tree is included in the count, but we use imaginary
-				// trees to handle going OOB so they have to be removed.
+				// trees to handle going OOB that have to be removed.
 				dy, dx, t := m.ProjectUntil(y, x, cardinals[c][0], cardinals[c][1], oob, blocks)
 				trees := common.Abs(int64(dx-x)) + common.Abs(int64(dy-y))
 				if t == oob {
