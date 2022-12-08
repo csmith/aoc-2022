@@ -53,7 +53,7 @@ func (m Map) Neighbours(row, col int, fallback Tile) []Tile {
 }
 
 // Count counts the number of cells in the map that match the given func.
-func (m Map) Count(matcher func(Tile)bool) int {
+func (m Map) Count(matcher func(Tile) bool) int {
 	res := 0
 	for y := range m {
 		res += CountTiles(m[y], matcher)
@@ -63,7 +63,7 @@ func (m Map) Count(matcher func(Tile)bool) int {
 
 // ProjectUntil projects a line from (row, col) that moves by (dy, dx) tiles each iteration until a tile is found
 // matching the given func. Returns the row, column and tile of the match.
-func (m Map) ProjectUntil(row, col int, dy, dx int, fallback Tile, matcher func(Tile)bool) (int, int, Tile) {
+func (m Map) ProjectUntil(row, col int, dy, dx int, fallback Tile, matcher func(Tile) bool) (int, int, Tile) {
 	y := row + dy
 	x := col + dx
 	for !matcher(m.SafeTileAt(y, x, fallback)) {
@@ -75,7 +75,7 @@ func (m Map) ProjectUntil(row, col int, dy, dx int, fallback Tile, matcher func(
 
 // Starburst projects lines out in the eight cardinal directions from the given cell until the given matcher is
 // satisfied.
-func (m Map) Starburst(row, col int, fallback Tile, matcher func(Tile)bool) []Tile {
+func (m Map) Starburst(row, col int, fallback Tile, matcher func(Tile) bool) []Tile {
 	var res []Tile
 	for _, n := range directions {
 		_, _, t := m.ProjectUntil(row, col, n[0], n[1], fallback, matcher)
@@ -85,7 +85,7 @@ func (m Map) Starburst(row, col int, fallback Tile, matcher func(Tile)bool) []Ti
 }
 
 // CountTiles counts the number of tiles in the slice that match the given matcher.
-func CountTiles(tiles []Tile, matcher func(Tile)bool) int {
+func CountTiles(tiles []Tile, matcher func(Tile) bool) int {
 	res := 0
 	for i := range tiles {
 		if matcher(tiles[i]) {
