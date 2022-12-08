@@ -12,7 +12,7 @@ const cdPrefix = "$ cd "
 
 func main() {
 	input := common.ReadFileAsStrings("07/input.txt")
-	files := make(map[string]int)
+	dirs := make(map[string]int)
 	cwd := "/"
 
 	// First build a map of files, so we don't over-count any duplicate `ls` results
@@ -27,20 +27,14 @@ func main() {
 				cwd = filepath.Clean(filepath.Join(cwd, arg))
 			}
 		} else if n, _ := fmt.Sscanf(input[i], "%d %s", &size, &name); n == 2 {
-			files[filepath.Join(cwd, name)] = size
-		}
-	}
-
-	// Now calculate the total size of each directory
-	dirs := make(map[string]int)
-	for f := range files {
-		dir := filepath.Dir(f)
-		for {
-			dirs[dir] += files[f]
-			if dir == "/" {
-				break
+			dir := cwd
+			for {
+				dirs[dir] += size
+				if dir == "/" {
+					break
+				}
+				dir = filepath.Dir(dir)
 			}
-			dir = filepath.Dir(dir)
 		}
 	}
 
