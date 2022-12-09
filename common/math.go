@@ -57,3 +57,14 @@ func Range(ints []int) (min, max int) {
 	}
 	return
 }
+
+// Sign returns a unit value with the same sign as i, or 0 if i is 0.
+func Sign(i int) int {
+	if i == 0 {
+		return 0
+	}
+	if i > 0 {
+		return 1
+	}
+	return -1
+}
