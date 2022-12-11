@@ -35,10 +35,8 @@ func main() {
 	}
 
 	for i := range input {
-		if input[i] == "noop" {
-			tick()
-		} else {
-			tick()
+		tick()
+		if input[i] != "noop" {
 			tick()
 			x += common.MustAtoi(strings.TrimPrefix(input[i], "addx "))
 		}

@@ -3,6 +3,7 @@ package common
 import (
 	"regexp"
 	"strconv"
+	"strings"
 )
 
 // MustAtoi converts the input string to an integer and panics on failure.
@@ -21,6 +22,14 @@ func AtoiSlice(input []string) []int {
 		res[i] = MustAtoi(input[i])
 	}
 	return res
+}
+
+// TrimSlice executes strings.TrimSpace on each input element. It returns the input slice for convenience.
+func TrimSlice(input []string) []string {
+	for i := range input {
+		input[i] = strings.TrimSpace(input[i])
+	}
+	return input
 }
 
 // TokeniseLine finds all matches of the given regex in the input string, and returns a slice of non-empty
