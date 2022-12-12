@@ -18,7 +18,10 @@ type monkey struct {
 
 func (m *monkey) ThrowStuff(divisor int, mod int) {
 	for i := range m.items {
-		v := (m.operation(m.items[i]) / divisor) % mod
+		v := m.operation(m.items[i]) / divisor
+		if mod > 0 {
+			v = v % mod
+		}
 		if v%m.test == 0 {
 			m.nextIfTrue.items = append(m.nextIfTrue.items, v)
 		} else {
@@ -41,14 +44,14 @@ func main() {
 	}
 
 	testLcm := initMonkeys(input, monkeys)
-	println(simulate(monkeys, 20, 3, testLcm))
+	println(simulate(monkeys, 20, 3, 0))
 
 	resetMonkeys(input, monkeys)
 	println(simulate(monkeys, 10000, 1, testLcm))
 }
 
 func initMonkeys(input [][]string, monkeys []*monkey) int {
-	var tests []int64
+	var testProduct = 1
 	for i := range input {
 		m := monkeys[i]
 		m.inspected = 0
@@ -57,9 +60,9 @@ func initMonkeys(input [][]string, monkeys []*monkey) int {
 		m.test = common.MustAtoi(input[i][3][21:])
 		m.nextIfTrue = monkeys[common.MustAtoi(input[i][4][29:])]
 		m.nextIfFalse = monkeys[common.MustAtoi(input[i][5][30:])]
-		tests = append(tests, int64(m.test))
+		testProduct *= m.test
 	}
-	return int(common.LCM(tests[0], tests[1], tests[2:]...))
+	return testProduct
 }
 
 func resetMonkeys(input [][]string, monkeys []*monkey) {
@@ -70,10 +73,10 @@ func resetMonkeys(input [][]string, monkeys []*monkey) {
 	}
 }
 
-func simulate(monkeys []*monkey, rounds, divisor, testLcm int) int {
+func simulate(monkeys []*monkey, rounds, divisor, mod int) int {
 	for i := 0; i < rounds; i++ {
 		for m := range monkeys {
-			monkeys[m].ThrowStuff(divisor, testLcm)
+			monkeys[m].ThrowStuff(divisor, mod)
 		}
 	}
 
