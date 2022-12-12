@@ -61,6 +61,18 @@ func (m Map) Count(matcher func(Tile) bool) int {
 	return res
 }
 
+// First finds the first (row-wise) matching tile in the map and returns its location.
+func (m Map) First(matcher func(Tile) bool) (row, col int) {
+	for y := range m {
+		for x := range m[y] {
+			if matcher(m[y][x]) {
+				return y, x
+			}
+		}
+	}
+	return -1, -1
+}
+
 // ProjectUntil projects a line from (row, col) that moves by (dy, dx) tiles each iteration until a tile is found
 // matching the given func. Returns the row, column and tile of the match.
 func (m Map) ProjectUntil(row, col int, dy, dx int, fallback Tile, matcher func(Tile) bool) (int, int, Tile) {
