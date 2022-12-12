@@ -27,28 +27,11 @@ type step struct {
 func main() {
 	grid := common.ReadFileAsMap("12/input.txt")
 
-	println(solve(grid, false, start, func(tile common.Tile) bool {
-		return tile == end
-	}))
+	part1 := 0
+	part2 := 0
 
-	println(solve(grid, true, end, func(tile common.Tile) bool {
-		return tile == start || tile == 'a'
-	}))
-}
-
-func height(tile common.Tile) int {
-	if tile == start {
-		return 'a'
-	} else if tile == end {
-		return 'z'
-	} else {
-		return int(tile)
-	}
-}
-
-func solve(grid common.Map, invert bool, from common.Tile, to func(common.Tile) bool) int {
 	startingRow, startingCol := grid.First(func(tile common.Tile) bool {
-		return tile == from
+		return tile == end
 	})
 
 	visited := make([][]bool, len(grid))
@@ -62,10 +45,14 @@ func solve(grid common.Map, invert bool, from common.Tile, to func(common.Tile) 
 		distance: 0,
 		row:      startingRow,
 		col:      startingCol,
-		height:   height(from),
+		height:   height(end),
 	}
 
 	for s := range steps {
+		if part1 > 0 && part2 > 0 {
+			break
+		}
+
 		for i := range directions {
 			newRow, newCol := s.row+directions[i][0], s.col+directions[i][1]
 			if newRow < 0 || newCol < 0 || newRow >= len(grid) || newCol >= len(grid[0]) || visited[newRow][newCol] {
@@ -75,11 +62,15 @@ func solve(grid common.Map, invert bool, from common.Tile, to func(common.Tile) 
 			t := grid.TileAt(newRow, newCol)
 			h := height(t)
 
-			if diff := h - s.height; (invert && diff >= -1) || (!invert && diff <= 1) {
+			// We're working backwards, so you can go down a single step or up any amount...
+			if diff := h - s.height; diff >= -1 {
 				visited[newRow][newCol] = true
 
-				if to(t) {
-					return s.distance + 1
+				if t == start && part1 == 0 {
+					part1 = s.distance + 1
+				}
+				if t == 'a' && part2 == 0 {
+					part2 = s.distance + 1
 				}
 
 				steps <- step{
@@ -92,5 +83,16 @@ func solve(grid common.Map, invert bool, from common.Tile, to func(common.Tile) 
 		}
 	}
 
-	return -1
+	println(part1)
+	println(part2)
+}
+
+func height(tile common.Tile) int {
+	if tile == start {
+		return 'a'
+	} else if tile == end {
+		return 'z'
+	} else {
+		return int(tile)
+	}
 }
