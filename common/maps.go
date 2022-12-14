@@ -6,6 +6,18 @@ type Tile rune
 // Map is a 2d map.
 type Map [][]Tile
 
+// NewMap creates a new Map of the given width and height, filled with the given tile.
+func NewMap(width, height int, filler Tile) Map {
+	m := make(Map, height)
+	for r := range m {
+		m[r] = make([]Tile, width)
+		for c := range m[r] {
+			m[r][c] = filler
+		}
+	}
+	return m
+}
+
 // ReadFileAsMap reads all lines from the given path and returns them as a two-dimensional map.
 // If an error occurs, the function will panic.
 func ReadFileAsMap(path string) Map {
