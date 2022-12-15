@@ -29,44 +29,60 @@ func main() {
 	cave[dropY-yMin][dropX-xMin] = drop
 	floorHeight := 2 + plotShelves(common.ReadFileAsStrings("14/input.txt"), cave)
 
-	rounds := 0
-	for dropSand(cave, dropX-xMin, dropY-yMin) {
-		rounds++
-	}
+	rounds := dropSand(cave, dropX-xMin, dropY-yMin)
 	println(rounds)
 
 	for x := xMin; x < xMax; x++ {
 		cave[floorHeight-yMin][x-xMin] = shelf
 	}
-	for cave[dropY-yMin][dropX-xMin] == drop && dropSand(cave, dropX-xMin, dropY-yMin) {
-		rounds++
-	}
-	println(rounds)
+
+	println(rounds + dropSand(cave, dropX-xMin, dropY-yMin))
 }
 
-func dropSand(cave common.Map, x, y int) bool {
+func dropSand(cave common.Map, x, y int) int {
 	bY, _, t := cave.ProjectUntil(y, x, 1, 0, oob, func(tile common.Tile) bool {
 		return tile == sand || tile == shelf || tile == oob
 	})
 
 	if t == oob {
 		// Bye bye, cruel world!
-		return false
+		return 0
 	}
 
-	// Check the diagonals
+	// Pour sand down the diagonals for as long as we can
+	rounds := 0
 	for _, xOffset := range []int{-1, 1} {
-		if t := cave.SafeTileAt(bY, x+xOffset, oob); t == empty {
-			return dropSand(cave, x+xOffset, bY)
-		} else if t == oob {
-			// Weeeeeeee
-			return false
+		for {
+			if t := cave.SafeTileAt(bY, x+xOffset, oob); t == empty {
+				if r := dropSand(cave, x+xOffset, bY); r > 0 {
+					rounds += r
+				} else {
+					return rounds
+				}
+			} else if t == oob {
+				// Weeeeeeee
+				return rounds
+			} else {
+				// Hit a shelf or otherwise blocked, carry on.
+				break
+			}
 		}
 	}
 
-	// This seems as good a place as any to settle
+	// Settle on top
 	cave[bY-1][x] = sand
-	return true
+	rounds++
+
+	// Optimisation: see if we can place sand above us
+	for nY := bY - 2; nY >= y; nY-- {
+		if r := dropSand(cave, x, nY); r > 0 {
+			rounds += r
+		} else {
+			return rounds
+		}
+	}
+
+	return rounds
 }
 
 func plotShelves(shelves []string, cave common.Map) int {
